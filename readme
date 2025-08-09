@@ -1,0 +1,59 @@
+Those look like **Prometheus Node Exporter metrics**, each representing a different aspect of system performance:
+
+---
+
+### **1️⃣ `node_network_receive_bytes_total`**
+
+* **What it is:**
+  Cumulative count of **bytes** received over all network interfaces since the system started.
+* **Type:** Counter (keeps increasing until reboot or interface reset).
+* **Use case:**
+  Monitor incoming network traffic, detect spikes, or track total bandwidth usage.
+* **Example query (rate over 5 minutes):**
+
+  ```promql
+  rate(node_network_receive_bytes_total[5m])
+  ```
+---
+
+### **2️⃣ `node_filesystem_avail_bytes`**
+
+* **What it is:**
+  Number of **bytes available** to non-root users on a filesystem.
+* **Type:** Gauge (can go up or down).
+* **Use case:**
+  Check disk free space, alert if nearing low thresholds.
+* **Example alert rule:**
+
+  ```promql
+  node_filesystem_avail_bytes{mountpoint="/"} < 5 * 1024 * 1024 * 1024
+  ```
+
+  *(alerts if less than 5 GB free on `/`)*
+
+---
+
+### **3️⃣ `node_memory_MemAvailable_bytes`** *(I think you meant this, not `MemAvailability_bytes`)*
+
+* **What it is:**
+  An estimate of memory available for starting new applications without swapping.
+* **Type:** Gauge.
+* **Use case:**
+  Detect low memory conditions before swap usage spikes.
+* **Example alert rule:**
+
+  ```promql
+  node_memory_MemAvailable_bytes < 500 * 1024 * 1024
+  ```
+
+  *(alerts if available memory < 500 MB)*
+
+---
+
+If you want, I can write you a **Prometheus alerting rules YAML** that triggers when:
+
+* Network receive rate is unusually high.
+* Disk space is low.
+* Memory availability drops below a threshold.
+
+That would tie these three metrics together into actionable monitoring.
